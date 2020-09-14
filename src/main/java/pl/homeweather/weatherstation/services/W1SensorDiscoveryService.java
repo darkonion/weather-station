@@ -6,5 +6,5 @@ import java.util.Optional;
 
 public interface W1SensorDiscoveryService {
 
-    Optional<TemperatureSensor> getTemperatureSensor(int maxRetryAmount);
+    Optional<TemperatureSensor> getTemperatureSensor();
 }

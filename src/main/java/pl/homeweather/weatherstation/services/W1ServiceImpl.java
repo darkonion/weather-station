@@ -18,7 +18,7 @@ public class W1ServiceImpl implements W1Service {
 
     @Override
     public Measurement getTemperatureMeasurement() {
-       Optional<TemperatureSensor> tempSensor = w1Discovery.getTemperatureSensor(2);
+       Optional<TemperatureSensor> tempSensor = w1Discovery.getTemperatureSensor();
 
        if (tempSensor.isEmpty()) {
            return Measurement.builder().build();
