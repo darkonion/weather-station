@@ -7,9 +7,16 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class Measurement {
+public class BasicMeasurement {
 
     @Builder.Default
     private final Double temperature = null;
+
+    @Builder.Default
+    private final Double pressure = null;
+
+    @Builder.Default
+    private final Double humidity = null;
+
     private final LocalDateTime date = LocalDateTime.now();
 }

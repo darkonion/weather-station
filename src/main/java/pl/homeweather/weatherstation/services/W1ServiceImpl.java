@@ -2,7 +2,6 @@ package pl.homeweather.weatherstation.services;
 
 import com.pi4j.component.temperature.TemperatureSensor;
 import org.springframework.stereotype.Service;
-import pl.homeweather.weatherstation.dtos.Measurement;
 
 import java.util.Optional;
 
@@ -17,14 +16,12 @@ public class W1ServiceImpl implements W1Service {
     }
 
     @Override
-    public Measurement getTemperatureMeasurement() {
+    public Double getTemperatureMeasurement() {
        Optional<TemperatureSensor> tempSensor = w1Discovery.getTemperatureSensor();
 
-       if (tempSensor.isEmpty()) {
-           return Measurement.builder().build();
+       if (!tempSensor.isPresent()) {
+           return null;
        }
-       return Measurement.builder()
-               .temperature(tempSensor.get().getTemperature())
-               .build();
+       return tempSensor.get().getTemperature();
     }
 }
