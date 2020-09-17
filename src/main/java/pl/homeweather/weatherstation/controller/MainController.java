@@ -11,10 +11,10 @@ public class MainController {
 
     private final BasicMeasurementAssemblyService assemblyService;
 
+
     public MainController(BasicMeasurementAssemblyService assemblyService) {
         this.assemblyService = assemblyService;
     }
-
 
     @GetMapping("/basic")
     public BasicMeasurement getTemperature() {

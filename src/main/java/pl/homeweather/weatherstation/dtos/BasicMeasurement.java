@@ -18,5 +18,8 @@ public class BasicMeasurement {
     @Builder.Default
     private final Double humidity = null;
 
+    @Builder.Default
+    private final Double lux = null;
+
     private final LocalDateTime date = LocalDateTime.now();
 }

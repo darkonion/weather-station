@@ -12,15 +12,24 @@ import static java.util.Optional.of;
 
 @Slf4j
 @Service
-public class W1SensorDiscoveryServiceImpl implements W1SensorDiscoveryService {
+public class W1TemperatureService implements W1Service {
 
     private final W1Master w1Master;
 
-    public W1SensorDiscoveryServiceImpl(W1Master w1Master) {
+    public W1TemperatureService(W1Master w1Master) {
         this.w1Master = w1Master;
     }
 
     @Override
+    public Double getMeasurement() {
+       Optional<TemperatureSensor> tempSensor = getTemperatureSensor();
+
+       if (!tempSensor.isPresent()) {
+           return null;
+       }
+       return tempSensor.get().getTemperature();
+    }
+
     public Optional<TemperatureSensor> getTemperatureSensor() {
         try {
             return of(w1Master.getDevices(TemperatureSensor.class).get(0));
@@ -29,4 +38,6 @@ public class W1SensorDiscoveryServiceImpl implements W1SensorDiscoveryService {
             return empty();
         }
     }
+
+
 }
