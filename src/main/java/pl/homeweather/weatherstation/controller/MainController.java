@@ -7,8 +7,6 @@ import pl.homeweather.weatherstation.dtos.PMS7003Measurement;
 import pl.homeweather.weatherstation.services.BasicMeasurementAssemblyService;
 import pl.homeweather.weatherstation.services.PMS7003Service;
 
-import java.util.concurrent.ExecutionException;
-
 
 @RestController
 public class MainController {

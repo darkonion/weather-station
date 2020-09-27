@@ -19,35 +19,31 @@ public class PMS7003Service {
 
 
     public PMS7003Measurement getMeasurement() {
-        PMS7003Measurement measurement = new PMS7003Measurement();
+        PMS7003Measurement measurement = PMS7003Measurement.builder().build();
         if (!driver.activate()) {
-            log.info("Unable to activate driver");
+            log.error("Unable to activate driver");
         }
 
         ScheduledFuture<PMS7003Measurement> future = scheduler.schedule(
                 driver::measure,
-                Duration.ofMinutes(1L).toMillis(),
+                Duration.ofMillis(40000L).toMillis(),
                 TimeUnit.MILLISECONDS);
 
         try {
-            measurement = future.get(Duration.ofMillis(75000L).toMillis(), TimeUnit.MILLISECONDS);
-        }
-        catch (InterruptedException e) {
-            log.error("Measurement interrupted. {}", e.getMessage());
+            measurement = future.get(
+                    Duration.ofMinutes(1L).toMillis(), TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            log.error("Measurement interrupted: {}", e.getMessage());
             future.cancel(true);
-        }
-        catch (TimeoutException e) {
-            log.error("Measurement timed out. {}", e.getMessage());
+        } catch (TimeoutException e) {
+            log.error("Measurement timed out: {}", e.getMessage());
             future.cancel(true);
-        }
-        catch (ExecutionException e) {
-            log.error("Measurement failed. {}", e.getMessage());
-        }
-        finally {
+        } catch (ExecutionException e) {
+            log.error("Measurement failed: {}", e.getMessage());
+            future.cancel(true);
+        } finally {
             driver.deactivate();
         }
         return measurement;
     }
-
-
 }

@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
+import static java.lang.String.format;
+
 @Slf4j
 public class PMS7003Driver {
 
@@ -20,6 +22,14 @@ public class PMS7003Driver {
     private Serial serial;
     private SerialDataEventListener listener;
     private ConcurrentLinkedDeque<byte[]> measurementBytesQueue;
+
+    public PMS7003Driver() {
+        try {
+            deactivate();
+        } catch (UnsatisfiedLinkError e) {
+            log.error("Deactivating at start fail: " + e.getMessage());
+        }
+    }
 
     public boolean connect() {
         if (isConnected())
@@ -60,13 +70,11 @@ public class PMS7003Driver {
 
         try {
             serial.open(config);
-
-            log.debug("Opened port.");
+            log.info("[PMS7003] Opened port.");
         }
         catch (IOException e) {
             log.error("Failed to open port. {}", e.getMessage());
         }
-
         return isConnected();
     }
 
@@ -84,17 +92,16 @@ public class PMS7003Driver {
             measurementBytesQueue.clear();
 
             log.debug("Closed port.");
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             log.error("Failed to close port. {}", e.getMessage());
+            return false;
         }
-
         return !isConnected();
     }
 
     public boolean activate() {
         if (!connect()) {
-            log.error("Can't activate, port not open.");
+            log.error("Can't activate, port not opened.");
             return false;
         }
 
@@ -103,7 +110,7 @@ public class PMS7003Driver {
             return false;
         }
 
-        log.debug("Activated.");
+        log.info("[PMS7003] Activated.");
 
         return true;
     }
@@ -119,7 +126,7 @@ public class PMS7003Driver {
             return false;
         }
 
-        log.debug("Deactivated.");
+        log.info("[PMS7003] Deactivated.");
 
         measurementBytesQueue.clear();
 
@@ -141,26 +148,12 @@ public class PMS7003Driver {
 
         byte[] bytes = measurementBytesQueue.pollLast();
 
-        PMS7003Measurement measurement = new PMS7003Measurement();
-
-        measurement.setTime(LocalDateTime.now());
-
-        measurement.setPm1_0_cf1(convertBytesToValue(bytes, 4));
-        measurement.setPm2_5_cf1(convertBytesToValue(bytes, 6));
-        measurement.setPm10_0_cf1(convertBytesToValue(bytes, 8));
-
-        measurement.setPm1_0_atmo(convertBytesToValue(bytes, 10));
-        measurement.setPm2_5_atmo(convertBytesToValue(bytes, 12));
-        measurement.setPm10_0_atmo(convertBytesToValue(bytes, 14));
-
-        measurement.setPm0_3_count(convertBytesToValue(bytes, 16));
-        measurement.setPm0_5_count(convertBytesToValue(bytes, 18));
-        measurement.setPm1_0_count(convertBytesToValue(bytes, 20));
-        measurement.setPm2_5_count(convertBytesToValue(bytes, 22));
-        measurement.setPm5_0_count(convertBytesToValue(bytes, 24));
-        measurement.setPm10_0_count(convertBytesToValue(bytes, 26));
-
-        return measurement;
+        return PMS7003Measurement.builder()
+                .date(LocalDateTime.now())
+                .pm1(convertBytesToValue(bytes, 10))
+                .pm25(convertBytesToValue(bytes, 12))
+                .pm10(convertBytesToValue(bytes, 14))
+                .build();
     }
 
     public boolean isConnected() {
@@ -174,21 +167,19 @@ public class PMS7003Driver {
     private boolean write(byte[] bytes) {
         try {
             serial.write(bytes);
-
             return true;
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             log.error("Failed to write bytes. {}", e.getMessage());
         }
-
         return false;
     }
 
     private String convertToHexString(byte[] bytes) {
         StringBuilder builder = new StringBuilder(bytes.length * 2);
 
-        for (byte b : bytes)
-            builder.append(String.format("%02x", b));
+        for (byte b : bytes) {
+            builder.append(format("%02x", b));
+        }
 
         return builder.toString();
     }
