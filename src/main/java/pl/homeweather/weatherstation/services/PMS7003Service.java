@@ -3,7 +3,7 @@ package pl.homeweather.weatherstation.services;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pl.homeweather.weatherstation.drivers.PMS7003Driver;
-import pl.homeweather.weatherstation.dtos.PMS7003Measurement;
+import pl.homeweather.weatherstation.dtos.AirPurityMeasurement;
 
 import java.time.Duration;
 import java.util.concurrent.*;
@@ -18,13 +18,13 @@ public class PMS7003Service {
     private final ScheduledExecutorService scheduler = newSingleThreadScheduledExecutor();
 
 
-    public PMS7003Measurement getMeasurement() {
-        PMS7003Measurement measurement = PMS7003Measurement.builder().build();
+    public AirPurityMeasurement getMeasurement() {
+        AirPurityMeasurement measurement = AirPurityMeasurement.builder().build();
         if (!driver.activate()) {
             log.error("Unable to activate driver");
         }
 
-        ScheduledFuture<PMS7003Measurement> future = scheduler.schedule(
+        ScheduledFuture<AirPurityMeasurement> future = scheduler.schedule(
                 driver::measure,
                 Duration.ofMillis(40000L).toMillis(),
                 TimeUnit.MILLISECONDS);
@@ -44,6 +44,7 @@ public class PMS7003Service {
         } finally {
             driver.deactivate();
         }
+        log.info(measurement.toString());
         return measurement;
     }
 }

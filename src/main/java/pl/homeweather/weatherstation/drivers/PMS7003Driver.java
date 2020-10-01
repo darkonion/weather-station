@@ -2,7 +2,7 @@ package pl.homeweather.weatherstation.drivers;
 
 import com.pi4j.io.serial.*;
 import lombok.extern.slf4j.Slf4j;
-import pl.homeweather.weatherstation.dtos.PMS7003Measurement;
+import pl.homeweather.weatherstation.dtos.AirPurityMeasurement;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -133,7 +133,7 @@ public class PMS7003Driver {
         return true;
     }
 
-    public PMS7003Measurement measure() {
+    public AirPurityMeasurement measure() {
         if (!connect()) {
             log.error("Can't measure, port not open.");
             return null;
@@ -148,7 +148,7 @@ public class PMS7003Driver {
 
         byte[] bytes = measurementBytesQueue.pollLast();
 
-        return PMS7003Measurement.builder()
+        return AirPurityMeasurement.builder()
                 .date(LocalDateTime.now())
                 .pm1(convertBytesToValue(bytes, 10))
                 .pm25(convertBytesToValue(bytes, 12))

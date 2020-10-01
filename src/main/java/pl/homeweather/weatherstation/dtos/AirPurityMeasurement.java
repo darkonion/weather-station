@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class PMS7003Measurement {
+public class AirPurityMeasurement {
 
     private LocalDateTime date;
 

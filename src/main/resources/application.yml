@@ -5,7 +5,9 @@ spring:
   application:
     name: weather-station
 
-  security:
-    user:
-      password: ${USER_PASS}
-      name: admin
+harvester:
+  url: http://80.211.242.104:8080/api
+  token: ${BASIC_TOKEN}
+station:
+  basic-cron: ${BASIC_CRON}
+  air-cron: ${AIR_CRON}
