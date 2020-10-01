@@ -21,7 +21,7 @@ public class BasicMeasurementAssemblyService {
         this.bh1750Service = bh1750Service;
     }
 
-    public BasicMeasurement assembleBasicMeasurement() {
+    public BasicMeasurement getMeasurement() {
         Double[] bme280Measurements = bme280Service.performMeasurement();
 
         BasicMeasurement basicMeasurement = BasicMeasurement

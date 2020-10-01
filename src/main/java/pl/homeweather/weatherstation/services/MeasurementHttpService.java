@@ -1,4 +1,4 @@
-package pl.homeweather.weatherstation.transmitters;
+package pl.homeweather.weatherstation.services;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -7,15 +7,13 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import pl.homeweather.weatherstation.dtos.AirPurityMeasurement;
 import pl.homeweather.weatherstation.dtos.BasicMeasurement;
-import pl.homeweather.weatherstation.services.BasicMeasurementAssemblyService;
-import pl.homeweather.weatherstation.services.PMS7003Service;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
 
 @Slf4j
 @Service
-public class MeasurementHttpCaller {
+public class MeasurementHttpService {
 
     private final WebClient webClient;
     private final BasicMeasurementAssemblyService basicMeasurementService;
@@ -24,7 +22,9 @@ public class MeasurementHttpCaller {
     private static final String BASIC_MEASUREMENT_URI = "/basic";
     private static final String AIR_MEASUREMENT_URI = "/air";
 
-    public MeasurementHttpCaller(WebClient webClient, BasicMeasurementAssemblyService basicMeasurementService, PMS7003Service airPurityService) {
+    public MeasurementHttpService(WebClient webClient,
+                                  BasicMeasurementAssemblyService basicMeasurementService,
+                                  PMS7003Service airPurityService) {
         this.webClient = webClient;
         this.basicMeasurementService = basicMeasurementService;
         this.airPurityService = airPurityService;
@@ -35,28 +35,26 @@ public class MeasurementHttpCaller {
         try {
             airMeasurementPostCall(airPurityService.getMeasurement());
         } catch (Exception e) {
-            log.info("Cannot connect to Weather Harvester, error: {}", e.getMessage());
-            log.debug(Arrays.toString(e.getStackTrace()));
+            errorHandling(e);
         }
     }
 
     @Scheduled(cron = "${station.basic-cron}")
     public void sendBasicMeasurement() {
         try {
-            basicMeasurementPostCall(basicMeasurementService.assembleBasicMeasurement());
+            basicMeasurementPostCall(basicMeasurementService.getMeasurement());
         } catch (Exception e) {
-            log.info("Cannot connect to Weather Harvester, error: {}", e.getMessage());
-            log.debug(Arrays.toString(e.getStackTrace()));
+            errorHandling(e);
         }
     }
 
     private void basicMeasurementPostCall(BasicMeasurement basicMeasurement) {
-       webClient.post().uri(BASIC_MEASUREMENT_URI)
-               .body(BodyInserters.fromPublisher(Mono.just(basicMeasurement), BasicMeasurement.class))
-               .exchange()
-               .doOnSuccess(s -> log.info("Basic measurement was successfully send!"))
-               .doOnError(e -> log.error("Failed to send current measurement"))
-               .subscribe();
+        webClient.post().uri(BASIC_MEASUREMENT_URI)
+                .body(BodyInserters.fromPublisher(Mono.just(basicMeasurement), BasicMeasurement.class))
+                .exchange()
+                .doOnSuccess(s -> log.info("Basic measurement was successfully send!"))
+                .doOnError(e -> log.error("Failed to send current measurement"))
+                .subscribe();
     }
 
     private void airMeasurementPostCall(AirPurityMeasurement airMeasurement) {
@@ -66,5 +64,10 @@ public class MeasurementHttpCaller {
                 .doOnSuccess(s -> log.info("Air measurement was successfully send!"))
                 .doOnError(e -> log.error("Failed to send current measurement"))
                 .subscribe();
+    }
+
+    private void errorHandling(Exception e) {
+        log.info("Cannot connect to Weather Harvester, error: {}", e.getMessage());
+        log.debug(Arrays.toString(e.getStackTrace()));
     }
 }
