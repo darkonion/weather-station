@@ -9,17 +9,10 @@ import java.time.LocalDateTime;
 @Builder
 public class BasicMeasurement {
 
-    @Builder.Default
-    private final Double temperature = null;
-
-    @Builder.Default
-    private final Double pressure = null;
-
-    @Builder.Default
-    private final Double humidity = null;
-
-    @Builder.Default
-    private final Double lux = null;
+    private final Double temperature;
+    private final Double pressure;
+    private final Double humidity;
+    private final Double lux;
 
     private final LocalDateTime date = LocalDateTime.now();
 }

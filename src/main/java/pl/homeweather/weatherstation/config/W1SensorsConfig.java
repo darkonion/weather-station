@@ -12,7 +12,7 @@ public class W1SensorsConfig {
     @Bean
     public W1Master getW1Master() {
         W1Master w1Master = new W1Master();
-        w1Master.getDeviceIDs().forEach(id -> log.info("Discovered device with ID: " + id));
+        w1Master.getDeviceIDs().forEach(id -> log.info("Discovered W1 device with ID: " + id));
         return w1Master;
     }
 }

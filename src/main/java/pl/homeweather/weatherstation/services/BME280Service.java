@@ -15,7 +15,7 @@ public class BME280Service {
 
     private final BME280Driver driver = new BME280Driver();
 
-    public Double[] performMeasurement() {
+    public Double[] getMeasurement() {
         try {
             return driver.readMeasurements();
         } catch (I2CFactory.UnsupportedBusNumberException | IOException e) {

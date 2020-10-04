@@ -11,7 +11,7 @@ import java.io.IOException;
 @Service
 public class BH1750Service {
 
-    public Float measureLux() {
+    public Float getMeasurement() {
         try {
             BH1750FVIDriver bh1750fvi = BH1750FVIDriver
                     .getInstance(I2CBus.BUS_1, BH1750FVIDriver.I2C_ADDRESS_23);

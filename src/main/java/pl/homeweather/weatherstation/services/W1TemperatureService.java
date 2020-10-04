@@ -12,7 +12,7 @@ import static java.util.Optional.of;
 
 @Slf4j
 @Service
-public class W1TemperatureService implements W1Service {
+public class W1TemperatureService {
 
     private final W1Master w1Master;
 
@@ -20,7 +20,6 @@ public class W1TemperatureService implements W1Service {
         this.w1Master = w1Master;
     }
 
-    @Override
     public Double getMeasurement() {
        Optional<TemperatureSensor> tempSensor = getTemperatureSensor();
 
@@ -30,7 +29,7 @@ public class W1TemperatureService implements W1Service {
        return tempSensor.get().getTemperature();
     }
 
-    public Optional<TemperatureSensor> getTemperatureSensor() {
+    private Optional<TemperatureSensor> getTemperatureSensor() {
         try {
             return of(w1Master.getDevices(TemperatureSensor.class).get(0));
         } catch (IndexOutOfBoundsException e) {
@@ -38,6 +37,4 @@ public class W1TemperatureService implements W1Service {
             return empty();
         }
     }
-
-
 }
