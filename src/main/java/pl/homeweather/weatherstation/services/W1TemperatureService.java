@@ -21,12 +21,9 @@ public class W1TemperatureService {
     }
 
     public Double getMeasurement() {
-       Optional<TemperatureSensor> tempSensor = getTemperatureSensor();
-
-       if (!tempSensor.isPresent()) {
-           return null;
-       }
-       return tempSensor.get().getTemperature();
+       return getTemperatureSensor()
+               .map(TemperatureSensor::getTemperature)
+               .orElse(null);
     }
 
     private Optional<TemperatureSensor> getTemperatureSensor() {

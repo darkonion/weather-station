@@ -9,9 +9,9 @@ import java.time.LocalDateTime;
 @Builder
 public class AirPurityMeasurement {
 
-    private LocalDateTime date;
+    private final Integer pm1;
+    private final Integer pm25;
+    private final Integer pm10;
 
-    private Integer pm1;
-    private Integer pm25;
-    private Integer pm10;
+    private final LocalDateTime date = LocalDateTime.now();
 }

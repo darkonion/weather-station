@@ -41,7 +41,7 @@ public class BH1750FVIDriver {
 
     private static final ConcurrentHashMap<String, BH1750FVIDriver> map = new ConcurrentHashMap<String, BH1750FVIDriver>();
 
-    synchronized public static BH1750FVIDriver getInstance(int i2cBusNumber, byte i2cAddress) {
+    public synchronized static BH1750FVIDriver getInstance(int i2cBusNumber, byte i2cAddress) {
         String key = i2cBusNumber + ":" + String.format("%x", i2cAddress);
         BH1750FVIDriver bh1750fvi = map.get(key);
         if (bh1750fvi == null) {
@@ -74,7 +74,7 @@ public class BH1750FVIDriver {
         }
     }
 
-    synchronized public void open() throws IOException {
+    public synchronized void open() throws IOException {
         try {
             log.debug(logPrefix + "before - useCount:{}", useCount.get());
             if (useCount.compareAndSet(0, 1)) {
@@ -85,7 +85,7 @@ public class BH1750FVIDriver {
         }
     }
 
-    synchronized public void close() throws IOException {
+    public synchronized void close() throws IOException {
         try {
             log.debug(logPrefix + "before - useCount:{}", useCount.get());
             if (useCount.compareAndSet(1, 0)) {

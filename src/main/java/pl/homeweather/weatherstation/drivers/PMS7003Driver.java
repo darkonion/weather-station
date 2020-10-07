@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import pl.homeweather.weatherstation.dtos.AirPurityMeasurement;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import static java.lang.String.format;
@@ -149,7 +148,6 @@ public class PMS7003Driver {
         byte[] bytes = measurementBytesQueue.pollLast();
 
         return AirPurityMeasurement.builder()
-                .date(LocalDateTime.now())
                 .pm1(convertBytesToValue(bytes, 10))
                 .pm25(convertBytesToValue(bytes, 12))
                 .pm10(convertBytesToValue(bytes, 14))
