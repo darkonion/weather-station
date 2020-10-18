@@ -19,8 +19,8 @@ public class MeasurementHttpService {
     private final BasicMeasurementAssemblyService basicMeasurementService;
     private final PMS7003Service airPurityService;
 
-    private static final String BASIC_MEASUREMENT_URI = "/basic";
-    private static final String AIR_MEASUREMENT_URI = "/air";
+    private static final String BASIC_MEASUREMENT_URI = "/api/basic";
+    private static final String AIR_MEASUREMENT_URI = "/api/air";
 
     public MeasurementHttpService(WebClient webClient,
                                   BasicMeasurementAssemblyService basicMeasurementService,
@@ -30,7 +30,7 @@ public class MeasurementHttpService {
         this.airPurityService = airPurityService;
     }
 
-    @Scheduled(cron = "${station.air-cron}")
+    @Scheduled(cron = "#{scheduleCalculator.getAirCron()}")
     public void sendAirMeasurement() {
         try {
             airMeasurementPostCall(airPurityService.getMeasurement());
@@ -39,7 +39,7 @@ public class MeasurementHttpService {
         }
     }
 
-    @Scheduled(cron = "${station.basic-cron}")
+    @Scheduled(cron = "#{scheduleCalculator.getBasicCron()}")
     public void sendBasicMeasurement() {
         try {
             basicMeasurementPostCall(basicMeasurementService.getMeasurement());
