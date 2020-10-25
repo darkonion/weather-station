@@ -16,7 +16,7 @@ import static java.util.Optional.ofNullable;
 
 @Slf4j
 @Service
-public class ScheduleCalculator {
+public class ScheduleExecutor {
 
     @Value("${station.air-cron}")
     private String defaultAirCron;
@@ -28,18 +28,22 @@ public class ScheduleCalculator {
     private String basicCron = null;
 
     private final WebClient webClient;
+    private final SchedulingService schedulingService;
 
     private static final String CRON_POLLING_URI = "/settings/cron";
 
 
-    public ScheduleCalculator(WebClient webClient) {
+    public ScheduleExecutor(WebClient webClient, SchedulingService schedulingService) {
         this.webClient = webClient;
+        this.schedulingService = schedulingService;
     }
 
     @PostConstruct
     private void initCron() {
         log.info("Initializing cron");
         getCron();
+        schedulingService.scheduleAirMeasurement(getAirCron());
+        schedulingService.scheduleBasicMeasurement(getBasicCron());
     }
 
     public String getAirCron() {
@@ -52,11 +56,10 @@ public class ScheduleCalculator {
 
     private void getCron() {
         Cron currentCron = tryGetCurrentCron();
-
         if (isCroneNotEmpty(currentCron)) {
             airCron = currentCron.getAirCron();
             basicCron = currentCron.getBasicCron();
-            log.info("Current cron: " + airCron + " <---> " + basicCron);
+            log.info("Basic Cron: {}, Air Cron: {}", basicCron, airCron);
         } else {
             log.info("Crone corrupted/empty, going back to default settings!");
         }
@@ -68,9 +71,17 @@ public class ScheduleCalculator {
         if (isCroneNotEmpty(currentCron) && isCroneChanged(currentCron)) {
             airCron = currentCron.getAirCron();
             basicCron = currentCron.getBasicCron();
-            log.info("Cron settings changed!");
-            log.info("Current cron after update: " + airCron + " <---> " + basicCron);
+            log.info("Cron settings changed! Basic Cron: {}, Air Cron: {}", basicCron, airCron);
+            newSchedule();
         }
+    }
+
+    private void newSchedule() {
+        schedulingService.cancelBasicMeasurementTask();
+        schedulingService.cancelAirMeasurementTask();
+
+        schedulingService.scheduleBasicMeasurement(getBasicCron());
+        schedulingService.scheduleAirMeasurement(getAirCron());
     }
 
     private Cron tryGetCurrentCron() {
