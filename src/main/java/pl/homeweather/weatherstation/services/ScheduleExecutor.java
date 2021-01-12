@@ -89,7 +89,7 @@ public class ScheduleExecutor {
         try {
             currentCron = getCurrentCron();
         } catch (Exception e) {
-            log.info("Failed during call for cron");
+            log.info("Failed during call for cron with: " + e.getMessage());
             currentCron = new Cron();
         }
         return currentCron;
